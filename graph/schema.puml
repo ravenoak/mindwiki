@@ -1,0 +1,54 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+class Link {
+    id: ID!
+    title: String!
+    address: String!
+    user: User!
+}
+
+class User {
+    id: ID!
+    name: String!
+}
+
+class Query {
+    links: [Link!]!
+}
+
+interface NewLink {
+    title: String!
+    address: String!
+}
+
+interface RefreshTokenInput{
+  token: String!
+}
+
+interface NewUser {
+  username: String!
+  password: String!
+}
+
+interface Login {
+  username: String!
+  password: String!
+}
+
+entity Mutation {
+  createLink(input: NewLink!): Link!
+  createUser(input: NewUser!): String!
+  login(input: Login!): String!
+  refreshToken(input: RefreshTokenInput!): String!
+}
+
+Link *-- User
+Query *-- "many" Link
+
+Mutation o-- NewLink
+Mutation o-- RefreshTokenInput
+Mutation o-- NewUser
+Mutation o-- Login
+
+@enduml
