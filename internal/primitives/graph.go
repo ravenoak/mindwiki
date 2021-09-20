@@ -6,22 +6,21 @@ import (
 
 // Graph is the structure that contains nodes and edges
 type Graph struct {
-	nodes []*Node
+	nodes map[uint64]*Node
 	edges map[Node][]*Node
 }
 
 // NewGraph returns a new empty graph
 func NewGraph() *Graph {
 	return &Graph{
-		nodes: make([]*Node, 0),
+		nodes: make(map[uint64]*Node),
 		edges: make(map[Node][]*Node),
 	}
 }
 
 // AddNode inserts a new node in the graph
-func (g *Graph) AddNode(el interface{}) *Node {
-	n := &Node{el}
-	g.nodes = append(g.nodes, n)
+func (g *Graph) AddNode(n *Node) *Node {
+	g.nodes[n.Id] = n
 	return n
 }
 

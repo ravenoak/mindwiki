@@ -19,7 +19,7 @@ type (
 
 	WebConfig struct {
 		Bind        string `mapstructure:"bind"`
-		Port        *int   `mapstructure:"port"`
+		Port        *uint16   `mapstructure:"port"`
 		TLSDisabled bool   `mapstructure:"tls_disabled"`
 	}
 )

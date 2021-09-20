@@ -27,8 +27,7 @@ func (a SQLiteAdapter) Query(parameters []interface{}) ([]interface{}, error) {
 
 func (a *SQLiteAdapter) Open() error {
 	var err error
-	dsn := "file://" + a.config.Path
-	a.db, err = sql.Open("sqlite3", dsn)
+	a.db, err = sql.Open("sqlite3", a.config.Path)
 	return err
 }
 
@@ -36,4 +35,8 @@ func (a SQLiteAdapter) Close() {
 	if err := a.db.Close(); err != nil {
 		log.Fatal().Err(err)
 	}
+}
+
+func NewSQLiteAdapter(c *config.StorageConfig) *SQLiteAdapter {
+	return &SQLiteAdapter{config: c}
 }

@@ -2,14 +2,18 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"time"
 
+	"github.com/ravenoak/mindwiki/internal/app"
 	"github.com/ravenoak/mindwiki/internal/config"
-	"github.com/ravenoak/mindwiki/internal/server"
+	//"github.com/ravenoak/mindwiki/internal/server"
+	server "github.com/ravenoak/mindwiki/internal/server/echo"
 	"github.com/ravenoak/mindwiki/internal/storage"
 	"github.com/ravenoak/mindwiki/internal/storage/adapters/bbolt"
+	"github.com/ravenoak/mindwiki/internal/storage/adapters/sqlite"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -39,7 +43,7 @@ const (
 var serveHTTPCommand = &cobra.Command{
 	Use:   "serve-http",
 	Short: "Start the HTTP service",
-	Run:   serve_http,
+	Run:   serveHttp,
 }
 
 func init() {
@@ -54,9 +58,8 @@ func init() {
 	rootCommand.AddCommand(serveHTTPCommand)
 }
 
-func serve_http(cmd *cobra.Command, args []string) {
+func serveHttp(cmd *cobra.Command, args []string) {
 	c := new(config.AppConfig)
-
 	if err := viper.Unmarshal(c); err != nil {
 		log.Fatal().Err(err)
 	}
@@ -64,26 +67,64 @@ func serve_http(cmd *cobra.Command, args []string) {
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	if c.DebugMode {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+		log.Info().Str("config", fmt.Sprintf("%+v", c)).Msg("debug enabled")
 	}
-	log.Debug().Msg("Debug enabled")
 
+	st := setupStorage(*c.StorageConfig)
+	startStorage(st)
+	s := setupServer(c, st)
+	defer stopStorage(st)
+	startServer(s)
+	log.Debug().Msg("this is in that weird area I don't fully understand yet")
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	log.Info().Msg("stopping server")
+	if err := s.Shutdown(ctx); err != nil {
+		log.Fatal().Err(err)
+	}
+}
 
-	store_ := bbolt.NewBBoltAdapter(c.StorageConfig)
-	store := storage.NewDepot(store_)
+func setupStorage(c config.StorageConfig) app.Storinator {
+	log.Info().Msg("initializing storage")
+	switch c.Driver {
+	case "bbolt":
+		return storage.NewDepot(bbolt.NewBBoltAdapter(&c))
+	case "sqlite":
+		return storage.NewDepot(sqlite.NewSQLiteAdapter(&c))
+	case "gorp-sqlite":
+		return storage.NewORP(&c)
+	default:
+		log.Fatal().Err(app.InvalidStorageTypeError(c.Driver))
+	}
+	return nil
+}
 
-	log.Info().Msg("Initializing storage")
-	err := store.Open()
+func startStorage(s app.Storinator) {
+	log.Info().Msg("starting storage")
+	err := s.Open()
 	if err != nil {
 		log.Fatal().Err(err)
 	}
+}
 
-	s, err := server.New(c, store)
+func stopStorage(s app.Storinator) {
+	log.Info().Msg("stopping storage")
+	if err := s.Close(); err != nil {
+		log.Fatal().Err(err)
+	}
+}
+
+func setupServer(c *config.AppConfig, s app.Storinator) app.HTTPServinator {
+	log.Debug().Msg("initializing server")
+	h, err := server.HTTPServer(c, s)
 	if err != nil {
 		log.Fatal().Err(err)
 	}
-	defer store.Close()
+	return h
+}
 
-	log.Info().Msg("Starting server")
+func startServer(s app.HTTPServinator) {
+	log.Info().Msg("starting server")
 	go func() {
 		if err := s.Start(); err != nil {
 			log.Fatal().Err(err)
@@ -93,9 +134,4 @@ func serve_http(cmd *cobra.Command, args []string) {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
-	if err := s.Shutdown(ctx); err != nil {
-		log.Fatal().Err(err)
-	}
 }

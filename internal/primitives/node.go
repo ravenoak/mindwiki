@@ -6,7 +6,7 @@ import (
 
 // Node element to keep element and next node together
 type Node struct {
-	ID uint64
+	Id uint64 `db:",primarykey,autoincrement"`
 }
 
 // String returns a string representation of the node

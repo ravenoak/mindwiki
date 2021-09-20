@@ -14,15 +14,15 @@ type Depot struct {
 	sections map[string]section
 }
 
-func (d *Depot) Get(id string) (interface{}, error) {
+func (d *Depot) Get(id string, t string) (interface{}, error) {
 	return nil, nil
 }
 
-func (d *Depot) Put(id string, object interface{}) error {
+func (d *Depot) Put(id string, t string, data interface{}) error {
 	return nil
 }
 
-func (d *Depot) Find(parameters []interface{}) ([]interface{}, error) {
+func (d *Depot) Find(q []interface{}) ([]interface{}, error) {
 	return nil, nil
 }
 
@@ -30,8 +30,9 @@ func (d *Depot) Open() error {
 	return d.adapter.Open()
 }
 
-func (d *Depot) Close() {
+func (d *Depot) Close() error {
 	d.adapter.Close()
+	return nil
 }
 
 func (d *Depot) NewSection(name string) *section {
@@ -44,15 +45,15 @@ type section struct {
 	sections map[string]section
 }
 
-func (s *section) Get(id string) (interface{}, error) {
+func (s *section) get(id string) (interface{}, error) {
 	return nil, nil
 }
 
-func (s *section) Put(id string, object interface{}) error {
+func (s *section) put(id string, object interface{}) error {
 	return nil
 }
 
-func (s *section) Find(parameters []interface{}) ([]interface{}, error) {
+func (s *section) find(parameters []interface{}) ([]interface{}, error) {
 	return nil, nil
 }
 

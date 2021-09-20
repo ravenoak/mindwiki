@@ -12,8 +12,3 @@ type Page struct {
 	Slug  string
 	Tags  []*Tag
 }
-
-func (p Page) Save() error {
-	return nil
-
-}
