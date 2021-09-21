@@ -1,5 +1,12 @@
 package storage
 
+import (
+	"errors"
+
+	"github.com/ravenoak/mindwiki/internal/data"
+	"github.com/ravenoak/mindwiki/internal/data/nodes"
+)
+
 type Logisticator interface {
 	Delete(set, id []byte) (interface{}, error)
 	Insert(set, id []byte, object interface{}) error
@@ -15,7 +22,17 @@ type Depot struct {
 }
 
 func (d *Depot) Get(id string, t string) (interface{}, error) {
-	return nil, nil
+
+	if t == "pages" {
+		return nodes.Page{
+			Node:  data.Node{uint64(42)},
+			Title: "Foobar and the Spammy Eggs",
+			Body:  "This is the body",
+			Slug:  "foobar-"+id,
+			Tags:  nil,
+		}, nil
+	}
+	return nil, errors.New("Run, you fools!")
 }
 
 func (d *Depot) Put(id string, t string, data interface{}) error {

@@ -29,9 +29,9 @@ func (s ProjectStatus) String() string {
 type Project struct {
 	Name        string
 	Description string
-	Slug        string
-	Status      ProjectStatus
-	StatusLine  string
-	Pages       []*Page
-	Tags        []*Tag
+	Slug       string
+	Status     ProjectStatus
+	StatusLine string
+	Pages      []*Page
+	Tags       []*Tag
 }

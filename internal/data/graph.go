@@ -1,4 +1,4 @@
-package primitives
+package data
 
 import (
 	"strings"

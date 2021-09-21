@@ -10,7 +10,7 @@ type (
 		Start() error
 	}
 
-	Storinator interface {
+	Persistenator interface {
 		Get(objectId string, objectType string) (interface{}, error)
 		Put(objectId string, objectType string, objectData interface{}) error
 		Find(queryParameters []interface{}) ([]interface{}, error)

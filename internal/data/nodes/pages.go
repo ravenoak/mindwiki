@@ -1,11 +1,11 @@
 package nodes
 
 import (
-	"github.com/ravenoak/mindwiki/internal/primitives"
+	"github.com/ravenoak/mindwiki/internal/data"
 )
 
 type Page struct {
-	primitives.Node
+	data.Node
 
 	Title string
 	Body  string

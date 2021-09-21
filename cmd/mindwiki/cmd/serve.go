@@ -9,7 +9,9 @@ import (
 
 	"github.com/ravenoak/mindwiki/internal/app"
 	"github.com/ravenoak/mindwiki/internal/config"
-	//"github.com/ravenoak/mindwiki/internal/server"
+	"github.com/ravenoak/mindwiki/internal/validator"
+
+	// "github.com/ravenoak/mindwiki/internal/server"
 	server "github.com/ravenoak/mindwiki/internal/server/echo"
 	"github.com/ravenoak/mindwiki/internal/storage"
 	"github.com/ravenoak/mindwiki/internal/storage/adapters/bbolt"
@@ -21,23 +23,23 @@ import (
 )
 
 const (
-	FLAG_BIND         = "bind"
-	FLAG_BIND_SHORT   = "b"
-	FLAG_BIND_DEFAULT = "0.0.0.0"
-	FLAG_BIND_DESCR   = "bind address for web server"
+	flagBind        = "bind"
+	flagBindShort   = "b"
+	flagBindDefault = "0.0.0.0"
+	flagBindDescr   = "bind address for web server"
 
-	FLAG_PORT         = "port"
-	FLAG_PORT_SHORT   = "p"
-	FLAG_PORT_DEFAULT = 1323
-	FLAG_PORT_DESCR   = "port for web server"
+	flagPort        = "port"
+	flagPortShort   = "p"
+	flagPortDefault = 1323
+	flagPortDescr   = "port for web server"
 
-	FLAG_TLS_DISABLE         = "disable-tls"
-	FLAG_TLS_DISABLE_DEFAULT = false
-	FLAG_TLS_DISABLE_DESCR   = "disable TLS for web server"
+	flagTLSDisable        = "disable-tls"
+	flagTLSDisableDefault = false
+	flagTLSDisableDescr   = "disable TLS for web server"
 
-	ENV_FLAG_BIND        = FLAG_BIND
-	ENV_FLAG_PORT        = FLAG_PORT
-	ENV_FLAG_TLS_DISABLE = "tls_disabled"
+	envFlagBind       = flagBind
+	envFlagPort       = flagPort
+	envFlagTlsDisable = "tls_disabled"
 )
 
 var serveHTTPCommand = &cobra.Command{
@@ -47,13 +49,13 @@ var serveHTTPCommand = &cobra.Command{
 }
 
 func init() {
-	serveHTTPCommand.Flags().StringP(FLAG_BIND, FLAG_BIND_SHORT, FLAG_BIND_DEFAULT, FLAG_BIND_DESCR)
-	serveHTTPCommand.Flags().IntP(FLAG_PORT, FLAG_PORT_SHORT, FLAG_PORT_DEFAULT, FLAG_PORT_DESCR)
-	serveHTTPCommand.Flags().Bool(FLAG_TLS_DISABLE, FLAG_TLS_DISABLE_DEFAULT, FLAG_TLS_DISABLE_DESCR)
+	serveHTTPCommand.Flags().StringP(flagBind, flagBindShort, flagBindDefault, flagBindDescr)
+	serveHTTPCommand.Flags().IntP(flagPort, flagPortShort, flagPortDefault, flagPortDescr)
+	serveHTTPCommand.Flags().Bool(flagTLSDisable, flagTLSDisableDefault, flagTLSDisableDescr)
 
-	_ = viper.BindPFlag(ENV_FLAG_BIND, serveHTTPCommand.Flags().Lookup(FLAG_BIND))
-	_ = viper.BindPFlag(ENV_FLAG_PORT, serveHTTPCommand.Flags().Lookup(FLAG_PORT))
-	_ = viper.BindPFlag(ENV_FLAG_TLS_DISABLE, serveHTTPCommand.Flags().Lookup(FLAG_TLS_DISABLE))
+	_ = viper.BindPFlag(envFlagBind, serveHTTPCommand.Flags().Lookup(flagBind))
+	_ = viper.BindPFlag(envFlagPort, serveHTTPCommand.Flags().Lookup(flagPort))
+	_ = viper.BindPFlag(envFlagTlsDisable, serveHTTPCommand.Flags().Lookup(flagTLSDisable))
 
 	rootCommand.AddCommand(serveHTTPCommand)
 }
@@ -64,10 +66,14 @@ func serveHttp(cmd *cobra.Command, args []string) {
 		log.Fatal().Err(err)
 	}
 
+	if err := validator.Validate(c); err != nil {
+		log.Fatal().Err(err)
+	}
+
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	if c.DebugMode {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-		log.Info().Str("config", fmt.Sprintf("%+v", c)).Msg("debug enabled")
+		log.Warn().Str("config", fmt.Sprintf("%#v", c)).Msg("")
 	}
 
 	st := setupStorage(*c.StorageConfig)
@@ -84,7 +90,7 @@ func serveHttp(cmd *cobra.Command, args []string) {
 	}
 }
 
-func setupStorage(c config.StorageConfig) app.Storinator {
+func setupStorage(c config.StorageConfig) app.Persistenator {
 	log.Info().Msg("initializing storage")
 	switch c.Driver {
 	case "bbolt":
@@ -99,7 +105,7 @@ func setupStorage(c config.StorageConfig) app.Storinator {
 	return nil
 }
 
-func startStorage(s app.Storinator) {
+func startStorage(s app.Persistenator) {
 	log.Info().Msg("starting storage")
 	err := s.Open()
 	if err != nil {
@@ -107,14 +113,14 @@ func startStorage(s app.Storinator) {
 	}
 }
 
-func stopStorage(s app.Storinator) {
+func stopStorage(s app.Persistenator) {
 	log.Info().Msg("stopping storage")
 	if err := s.Close(); err != nil {
 		log.Fatal().Err(err)
 	}
 }
 
-func setupServer(c *config.AppConfig, s app.Storinator) app.HTTPServinator {
+func setupServer(c *config.AppConfig, s app.Persistenator) app.HTTPServinator {
 	log.Debug().Msg("initializing server")
 	h, err := server.HTTPServer(c, s)
 	if err != nil {

@@ -21,11 +21,11 @@ type (
 	server struct {
 		config  *config.WebConfig
 		echo    *echo.Echo
-		storage app.Storinator
+		storage app.Persistenator
 	}
 )
 
-func HTTPServer(c *config.AppConfig, st app.Storinator) (app.HTTPServinator, error) {
+func HTTPServer(c *config.AppConfig, st app.Persistenator) (app.HTTPServinator, error) {
 	e := echo.New()
 	e.Debug = c.DebugMode
 	if c.DebugMode {
@@ -56,7 +56,7 @@ func HTTPServer(c *config.AppConfig, st app.Storinator) (app.HTTPServinator, err
 }
 
 func (s *server) Start() error {
-	return s.echo.Start(fmt.Sprintf("%s:%d", s.config.Bind, *s.config.Port))
+	return s.echo.Start(fmt.Sprintf("%s:%d", s.config.Bind, s.config.Port))
 }
 
 func (s *server) Shutdown(ctx context.Context) error {

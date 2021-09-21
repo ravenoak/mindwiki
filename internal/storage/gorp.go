@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-gorp/gorp/v3"
 	"github.com/ravenoak/mindwiki/internal/config"
-	"github.com/ravenoak/mindwiki/internal/nodes"
+	"github.com/ravenoak/mindwiki/internal/data/nodes"
 )
 
 type ORP struct {

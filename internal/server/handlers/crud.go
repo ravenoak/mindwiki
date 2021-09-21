@@ -3,38 +3,37 @@ package handlers
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/ravenoak/mindwiki/internal/app"
-	"github.com/ravenoak/mindwiki/internal/nodes"
-	"github.com/ravenoak/mindwiki/internal/primitives"
 	"github.com/rs/zerolog/log"
 )
 
 type CRUDHandler struct {
 	objectType string
-	storage    app.Storinator
+	storage    app.Persistenator
 	echo       *echo.Group
 }
 
 func (h *CRUDHandler) Create(c echo.Context) error {
+	t := c.Request().Header["Content-Type"]
+	log.Debug().Interface("header:Content-Type", t).Msg("")
+	log.Debug().Interface("Request", c.Request()).Msg("")
 	return nil
 }
 
 func (h *CRUDHandler) Read(c echo.Context) error {
-	id, _ := strconv.ParseUint(c.Param("id"), 10, 16)
+	// id, err := strconv.ParseUint(c.Param("id"), 10, 16)
+	// if err != nil {
+	//	log.Debug().Err(err).Msg("parsing \"id\"")
+	//	return err
+	// }
+	id := c.Param("id")
 	a := strings.Split(c.Request().Header["Accept"][0], ",")
-	log.Debug().Interface("header-accept", a).Msg("")
-	// o, _ := h.storage.Get(id, h.objectType)
-	o := nodes.Page{
-		Node:  primitives.Node{uint64(id)},
-		Title: "Foobar and the Spammy Eggs",
-		Body:  "This is the body",
-		Slug:  "foobar",
-		Tags:  nil,
-	}
+	log.Debug().Interface("header:Accept", a).Msg("")
+	o, _ := h.storage.Get(id, h.objectType)
+
 	for _, v := range a {
 		if v == "text/html" {
 			return c.String(http.StatusOK, fmt.Sprintf("%#v", o))
@@ -88,7 +87,7 @@ func (h *CRUDHandler) Register(e *echo.Echo, p string, m ...echo.MiddlewareFunc)
 	h.echo.DELETE("/:id", h.Delete)
 }
 
-func NewCRUDHandler(t string, s app.Storinator) *CRUDHandler {
+func NewCRUDHandler(t string, s app.Persistenator) *CRUDHandler {
 	return &CRUDHandler{
 		objectType: t,
 		storage:    s,

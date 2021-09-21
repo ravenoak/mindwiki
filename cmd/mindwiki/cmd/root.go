@@ -9,17 +9,23 @@ import (
 )
 
 const (
-	ENV_PREFIX = "mindwiki"
+	envPrefix = "mindwiki"
 
-	FLAG_APP_ENV_DEFAULT = "development"
+	flagAppEnvDefault = "development"
 
-	FLAG_DEBUG           = "debug"
-	FLAG_DEBUG_SHORT     = "d"
-	FLAG_DEBUG_DEFAULT   = false
-	FLAG_DEBUG_DESCR     = "enable debug mode"
+	flagDebug        = "debug"
+	flagDebugShort   = "d"
+	flagDebugDefault = false
+	flagDebugDescr   = "enable debug mode"
 
-	ENV_FLAG_APP_ENV = "app_env"
-	ENV_FLAG_DEBUG   = "debug_mode"
+	flagStorage        = "storage"
+	flagStorageShort   = "s"
+	flagStorageDefault = "bbolt"
+	flagStorageDescr   = "storage type"
+
+	envFlagAppEnv  = "app_env"
+	envFlagDebug   = "debug_mode"
+	envFlagStorage = "storage"
 )
 
 var rootCommand = &cobra.Command{
@@ -37,16 +43,18 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCommand.PersistentFlags().BoolP(FLAG_DEBUG, FLAG_DEBUG_SHORT, FLAG_DEBUG_DEFAULT, FLAG_DEBUG_DESCR)
+	rootCommand.PersistentFlags().BoolP(flagDebug, flagDebugShort, flagDebugDefault, flagDebugDescr)
+	rootCommand.PersistentFlags().StringP(flagStorage, flagStorageShort, flagStorageDefault, flagStorageDescr)
 }
 
 func initConfig() {
-	viper.SetEnvPrefix(ENV_PREFIX)
+	viper.SetEnvPrefix(envPrefix)
 
-	viper.SetDefault(ENV_FLAG_APP_ENV, FLAG_APP_ENV_DEFAULT)
-	viper.SetDefault(ENV_FLAG_DEBUG, FLAG_DEBUG_DEFAULT)
+	viper.SetDefault(envFlagAppEnv, flagAppEnvDefault)
+	viper.SetDefault(envFlagDebug, flagDebugDefault)
 
-	_ = viper.BindPFlag(ENV_FLAG_DEBUG, rootCommand.Flags().Lookup(FLAG_DEBUG))
+	_ = viper.BindPFlag(envFlagDebug, rootCommand.Flags().Lookup(flagDebug))
+	_ = viper.BindPFlag(envFlagStorage, rootCommand.Flags().Lookup(flagStorage))
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("toml")
@@ -55,6 +63,7 @@ func initConfig() {
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
 
+	// TODO: Make this not panic (generate default? just run with default?) or more helpful/human message
 	if err != nil {
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}

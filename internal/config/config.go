@@ -6,7 +6,7 @@ import (
 
 type (
 	AppConfig struct {
-		AppEnv        *string        `mapstructure:"app_env"`
+		AppEnv        string         `mapstructure:"app_env"`
 		DebugMode     bool           `mapstructure:"debug_mode"`
 		StorageConfig *StorageConfig `mapstructure:"storage_config"`
 		WebConfig     *WebConfig     `mapstructure:"web_config"`
@@ -19,14 +19,20 @@ type (
 
 	WebConfig struct {
 		Bind        string `mapstructure:"bind"`
-		Port        *uint16   `mapstructure:"port"`
+		Port        uint16 `mapstructure:"port"`
 		TLSDisabled bool   `mapstructure:"tls_disabled"`
 	}
 )
 
 func (c *AppConfig) IsValid(errors validator.Error) {
-	if c.AppEnv == nil {
+	if c.AppEnv == "" {
 		errors.Add("app environment not configured")
+	}
+	if c.StorageConfig == nil {
+		errors.Add("storage not configured")
+	}
+	if c.WebConfig == nil {
+		errors.Add("webserver not configured")
 	}
 }
 
@@ -40,7 +46,7 @@ func (c *StorageConfig) IsValid(errors validator.Error) {
 }
 
 func (c *WebConfig) IsValid(errors validator.Error) {
-	if c.Port == nil {
+	if c.Port == 0 {
 		errors.Add("port not configured")
 	}
 }
