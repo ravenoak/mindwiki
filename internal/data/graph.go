@@ -2,19 +2,22 @@ package data
 
 import (
 	"strings"
+
+	"github.com/ravenoak/mindwiki/internal/app"
 )
 
 // Graph is the structure that contains nodes and edges
 type Graph struct {
 	nodes map[uint64]*Node
-	edges map[Node][]*Node
+	edges map[uint64]*Edge
+	store app.Persistenator
 }
 
 // NewGraph returns a new empty graph
 func NewGraph() *Graph {
 	return &Graph{
 		nodes: make(map[uint64]*Node),
-		edges: make(map[Node][]*Node),
+		edges: make(map[uint64]*Edge),
 	}
 }
 
@@ -25,9 +28,9 @@ func (g *Graph) AddNode(n *Node) *Node {
 }
 
 // AddEdge inserts a new edge in the graph
-func (g *Graph) AddEdge(n1, n2 *Node) {
-	g.edges[*n1] = append(g.edges[*n1], n2)
-	g.edges[*n2] = append(g.edges[*n2], n1)
+func (g *Graph) AddEdge(e *Edge) {
+	g.edges[e.Id] = e
+	g.store.Put()
 }
 
 // String returns a string representation of the graph

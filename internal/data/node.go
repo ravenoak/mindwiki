@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-// Node element to keep element and next node together
+// Node element
 type Node struct {
 	Id uint64 `db:",primarykey,autoincrement"`
 }
