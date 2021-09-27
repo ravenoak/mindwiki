@@ -1,5 +1,9 @@
 package main
 
-func main() {
+import (
+	"github.com/ravenoak/mindwiki/cmd"
+)
 
+func main() {
+	cmd.Execute()
 }

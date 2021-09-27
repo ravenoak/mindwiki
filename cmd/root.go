@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -11,21 +12,17 @@ import (
 const (
 	envPrefix = "mindwiki"
 
-	flagAppEnvDefault = "development"
-
 	flagDebug        = "debug"
 	flagDebugShort   = "d"
 	flagDebugDefault = false
 	flagDebugDescr   = "enable debug mode"
 
-	flagStorage        = "storage"
-	flagStorageShort   = "s"
-	flagStorageDefault = "bbolt"
-	flagStorageDescr   = "storage type"
+	flagStorage      = "storage-path"
+	flagStorageShort = "s"
+	flagStorageDescr = "path to store all data"
 
-	envFlagAppEnv  = "app_env"
 	envFlagDebug   = "debug_mode"
-	envFlagStorage = "storage"
+	envFlagStorage = "storage_path"
 )
 
 var rootCommand = &cobra.Command{
@@ -44,13 +41,13 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCommand.PersistentFlags().BoolP(flagDebug, flagDebugShort, flagDebugDefault, flagDebugDescr)
-	rootCommand.PersistentFlags().StringP(flagStorage, flagStorageShort, flagStorageDefault, flagStorageDescr)
+	rootCommand.PersistentFlags().StringP(flagStorage, flagStorageShort, "", flagStorageDescr)
 }
 
 func initConfig() {
 	viper.SetEnvPrefix(envPrefix)
+	viper.AutomaticEnv()
 
-	viper.SetDefault(envFlagAppEnv, flagAppEnvDefault)
 	viper.SetDefault(envFlagDebug, flagDebugDefault)
 
 	_ = viper.BindPFlag(envFlagDebug, rootCommand.Flags().Lookup(flagDebug))
@@ -61,10 +58,13 @@ func initConfig() {
 	viper.AddConfigPath("/etc/mindwiki/")
 	viper.AddConfigPath("$HOME/.mindwiki/")
 	viper.AddConfigPath(".")
-	err := viper.ReadInConfig()
-
-	// TODO: Make this not panic (generate default? just run with default?) or more helpful/human message
-	if err != nil {
-		panic(fmt.Errorf("Fatal error config file: %s \n", err))
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			// Config file not found; ignore error if desired
+			log.Info().Msg("config file not found")
+		} else {
+			// Config file was found but another error was produced
+			log.Error().Err(err)
+		}
 	}
 }
