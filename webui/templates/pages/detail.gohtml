@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load static %}
+{% load markdown %}
+{% block metatags %}
+    <title>{ page.title }} | MindWiki</title>
+    <meta name="description" content="A Wiki to organize your thoughts">
+    <meta property="og:title" content="{ page.title }}">
+    <meta property="og:site_name" content="MindWiki">
+    <meta property="og:url" content="http://localhost">
+    <meta property="og:description" content="A Wiki to organize your thoughts">
+    <meta property="og:type" content="website">
+{% endblock %}
+{% block content %}
+    <header class="jumbotron">
+        <div class="container">
+            <nav id="page-nav" class="navbar navbar-expand-lg shadow">
+                <div class="container-fluid">
+                    <p class="h1"><strong>{ page.title }}</strong></p>
+                </div>
+                <div class="nav justify-content-end">
+                    <div class="d-inline">
+                        <a class="nav-link text-black font-weight-bold"
+                           href="{% url 'admin:mindwiki_page_change' page.pk %}">edit</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 mt-3 left">
+                <div class="container-fluid">
+                    { page.body | markdown | safe }}
+                </div>
+                <div class="container-fluid">
+                    Tags:
+                    <ul>
+                        {% for tag in page.tags.all %}
+                            <li>{ tag.name }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

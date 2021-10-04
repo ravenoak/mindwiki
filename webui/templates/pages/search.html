@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load static %}
+{% load markdown %}
+{% block metatags %}
+    <title>Search | MindWiki</title>
+    <meta name="description" content="A Wiki to organize your thoughts">
+    <meta property="og:title" content="Search">
+    <meta property="og:site_name" content="MindWiki">
+    <meta property="og:url" content="http://localhost">
+    <meta property="og:description" content="A Wiki to organize your thoughts">
+    <meta property="og:type" content="website">
+{% endblock %}
+{% block content %}
+    <header class="jumbotron">
+        <div class="container">
+            <p class="h1">Search the <strong>MindWiki</strong>: Pages</p>
+        </div>
+    </header>
+    <div class="container">
+        <div class="row">
+            <form method="get">
+                <div class="mb-3">
+                    <label for="contains" class="form-label">Contains</label>
+                    <input type="search" id="contains" name="contains">
+                    <div id="containsHelpBlock" class="form-text">
+                        Performs a sub-string search on the <strong>body</strong> and <strong>title</strong> fields.
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="tags" class="form-label">Tags</label>
+                    <input type="search" id="tags" name="tags">
+                    <div id="tagsHelpBlock" class="form-text">
+                        Performs a sub-string search on the <strong>tags</strong> field. Use a comma to separate
+                        multiple tags.
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+        <div class="row">
+            <div class="col-md-8 mt-3 left">
+                {% if search_results %}
+                    {% for page in search_results %}
+                        <div class="shadow-none card mb-4" id="newsfeed"
+                             style="background-image: url({% url 'word_cloud:create' %}?width=350&height=70&bg=F1F8E9&words={{ page.tags.all|join:'.'|urlencode }}&cmap=Set2); background-repeat: no-repeat; background-position: right; background-color: #F1F8E9;">
+                            <div class="card-body">
+                                <h3 class="card-title">
+                                    <a href="{% url 'mindwiki:page-detail' page.slug %}">{{ page.title }}</a>
+                                </h3>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="container-fluid">
+                        <p>
+                            No pages are available. Why don't you <a href="{% url 'admin:mindwiki_page_add' %}">add one</a>.
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="pagination">
+                <span class="step-links">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1">&laquo; first</a>
+                        <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+                    {% endif %}
+                    <span class="current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.</span>
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}">next</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -20,6 +20,6 @@ func (h *pageHandler) Display(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *pageHandler) Setup() {
+	h.rtr.HandleFunc("/{slug}", h.Display).Methods("GET")
 	h.rtr.HandleFunc("/{slug}/", h.Display).Methods("GET")
 }
-

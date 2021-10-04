@@ -23,16 +23,18 @@ const (
 	errRtrNil = "dude, where's your router?; `s.rtr` is nil"
 )
 
-//go:embed static
+//go:embed static/*
 var staticFS embed.FS
-//go:embed templates
+
+//go:embed templates/*
 var templateFS embed.FS
 
 type WebUIServer struct {
 	addr string
 
-	rtr *mux.Router
-	svr *http.Server
+	rtr  *mux.Router
+	svr  *http.Server
+	tmpl *template.Template
 
 	static http.Handler
 
@@ -87,6 +89,8 @@ func NewServer(addr string) *WebUIServer {
 	}
 
 	r.Handle("/static", st)
+	s.tmpl = template.Must(template.ParseFS(templateFS, "templates/*.gohtml", "templates/*/*.gohtml"))
+	log.Info().Msg(s.tmpl.DefinedTemplates())
 	s.setupHome()
 	s.setupPages()
 
@@ -100,8 +104,8 @@ func (s *WebUIServer) setupHome() {
 
 	s.hh = &homeHandler{}
 
-	s.hh.displayTemplate = template.Must(template.ParseFS(templateFS, "templates/home.html"))
-	log.Debug().Interface("s.hh.displayTemplate", s.hh.displayTemplate).Msg("initialized template")
+	s.hh.t = s.tmpl
+	log.Debug().Interface("s.hh.t", s.hh.t).Msg("initialized template")
 	s.rtr.HandleFunc("/", s.hh.Display).Methods("GET")
 }
 

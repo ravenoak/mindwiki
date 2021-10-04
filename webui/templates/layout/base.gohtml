@@ -1,0 +1,103 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html prefix="og: http://ogp.me/ns#" lang="en">
+<head>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
+          crossorigin="anonymous"></script>
+  {{template "meta" .}}
+  <meta property="og:type" content="website">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  <style>
+      body {
+          background-color: rgb(245, 247, 245);
+      }
+      .mw-pj-st-ns {
+          background-color: rgb(64, 64, 64);
+      }
+      .mw-pj-st-ip {
+          background-color: rgb(10, 183, 10);
+      }
+      .mw-pj-st-b {
+          background-color: rgb(224, 92, 32);
+      }
+      .mw-pj-st-c {
+          background-color: rgb(84, 62, 41);
+      }
+  </style>
+</head>
+<body>
+<div id="bodydiv">
+  <div id="nofooter">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow" id="topnav">
+      <div class="container-fluid">
+        <a class="navbar-brand" href=" url mindwiki:index ">
+          <img src="/static/icons/logo.svg" width="50" height="30" class="d-inline-block rounded align-top"
+               alt="logo" loading="lazy">
+          MindWiki
+        </a>
+        <div class="nav justify-content-end">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="{% #url 'mindwiki:index' %}">Home</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarBrowseDropdown" role="button"
+                 data-bs-toggle="dropdown" aria-expanded="false">
+                Browse
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarBrowseDropdown">
+                <li><a class="dropdown-item" href="{% #url 'mindwiki:page-index' %}">Pages</a></li>
+                <li><a class="dropdown-item" href="{% #url 'mindwiki:project-index' %}">Projects</a></li>
+                <li><a class="dropdown-item" href="{% #url 'mindwiki:tag-index' %}">Tags</a></li>
+                <li><a class="dropdown-item" href="{% #url 'mindwiki:weblink-index' %}">WebLinks</a></li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarSearchDropdown" role="button"
+                 data-bs-toggle="dropdown" aria-expanded="false">
+                Search
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarSearchDropdown">
+                <li><a class="dropdown-item" href="{% #url 'mindwiki:page-search' %}">Pages</a></li>
+                <li>
+                  <a class="dropdown-item" href="{% #url 'mindwiki:project-search' %}">Projects</a>
+                </li>
+                <li><a class="dropdown-item" href="{% #url 'mindwiki:tag-search' %}">Tags</a></li>
+                <li><a class="dropdown-item" href="{% #url 'mindwiki:weblink-search' %}">WebLinks</a></li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% #url 'admin:index' %}" tabindex="-1">Admin</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    {{block "content" .}}{{end}}
+  </div>
+  <footer class="footer" id="foot">
+    <div class="container"><h5 style="text-align:center;"></h5>
+      <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+          <p></p>
+          <div class="nav justify-content-center" id="navfooter">
+                        <span><a class="nav-link text-black font-weight-bold"
+                                 href="{% #url 'mindwiki:index' %}">About</a></span>
+            <span><a class="nav-link text-black font-weight-bold"
+                     href="https://github.com/ravenoak/mindwiki.py">GitHub</a></span>
+            <span><a class="nav-link text-black font-weight-bold" href="{% #url 'mindwiki:index' %}"></a></span>
+            <span><a class="nav-link text-black font-weight-bold" href="#"></a></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </footer>
+</div>
+</body>
+</html>
+{{end}}

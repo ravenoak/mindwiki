@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+{% load markdown %}
+{% block metatags %}
+    <title>Add New Page | MindWiki</title>
+    <meta name="description" content="A Wiki to organize your thoughts">
+    <meta property="og:title" content="Add New Page">
+    <meta property="og:site_name" content="MindWiki">
+    <meta property="og:url" content="http://localhost">
+    <meta property="og:description" content="A Wiki to organize your thoughts">
+    <meta property="og:type" content="website">
+    <!-- <script src="https://cdn.ckeditor.com/ckeditor5/28.0.0/classic/ckeditor.js"></script> -->
+{% endblock %}
+{% block content %}
+    <header class="jumbotron">
+        <div class="container">
+            <p class="h1">
+                <strong>{% if page %}{{ page }}{% else %}Add New Page{% endif %}</strong>
+            </p>
+
+        </div>
+    </header>
+    <div class="container">
+        <div class="row">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <div class="mb-3">
+                    {{ form.title.errors }}
+                    <label for="{{ form.title.id_for_label }}" class="form-label">Title:</label>
+                    {{ form.title }}
+                    <div id="titleHelpBlock" class="form-text">
+                        Will be displayed at the top of the page and shown in lists of pages.
+                    </div>
+                </div>
+                <div class="mb-3">
+                    {{ form.body.errors }}
+                    <label for="{{ form.body.id_for_label }}" class="form-label">Body:</label>
+                    {{ form.body }}
+                    <div id="bodyHelpBlock" class="form-text">
+                        Markdown supported.
+                    </div>
+                </div>
+                <div class="mb-3">
+                    {{ form.slug.errors }}
+                    <label for="{{ form.slug.id_for_label }}" class="form-label">Slug:</label>
+                    {{ form.slug }}
+                    <div id="slugHelpBlock" class="form-text">
+                        Used as a friendly page identifier in URLs. Accepts [A-Za-z0-9_-].
+                    </div>
+                </div>
+                <div class="mb-3">
+                    {{ form.tags.errors }}
+                    <label for="{{ form.tags.id_for_label }}" class="form-label">Tags:</label>
+                    {{ form.tags }}
+                    <div id="tagsHelpBlock" class="form-text">
+                        Multi-select. <em>Still need to add "new tag" support</em>.
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    {% if page %}Update Page{% else %}Add New Page{% endif %}
+                </button>
+            </form>
+            <!-- <script>
+                ClassicEditor
+                    .create(document.querySelector('#editor'), {
+                        plugins: [
+                            Markdown,
+                        ]})
+                    .catch(error => {
+                        console.error(error);
+                    });
+            </script> -->
+        </div>
+    </div>
+{% endblock %}
