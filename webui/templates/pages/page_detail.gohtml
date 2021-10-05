@@ -1,21 +1,10 @@
-{% extends "base.html" %}
-{% load static %}
-{% load markdown %}
-{% block metatags %}
-    <title>{ page.title }} | MindWiki</title>
-    <meta name="description" content="A Wiki to organize your thoughts">
-    <meta property="og:title" content="{ page.title }}">
-    <meta property="og:site_name" content="MindWiki">
-    <meta property="og:url" content="http://localhost">
-    <meta property="og:description" content="A Wiki to organize your thoughts">
-    <meta property="og:type" content="website">
-{% endblock %}
-{% block content %}
+{{define "meta"}}{{end}}
+{{define "content"}}
     <header class="jumbotron">
         <div class="container">
             <nav id="page-nav" class="navbar navbar-expand-lg shadow">
                 <div class="container-fluid">
-                    <p class="h1"><strong>{ page.title }}</strong></p>
+                    <p class="h1"><strong>{{ .P.Title }}</strong></p>
                 </div>
                 <div class="nav justify-content-end">
                     <div class="d-inline">
@@ -30,7 +19,7 @@
         <div class="row">
             <div class="col-md-8 mt-3 left">
                 <div class="container-fluid">
-                    { page.body | markdown | safe }}
+                    {{ .P.Body }}
                 </div>
                 <div class="container-fluid">
                     Tags:
@@ -43,4 +32,5 @@
             </div>
         </div>
     </div>
-{% endblock %}
+{{end}}
+{{template "base" .}}

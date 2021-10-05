@@ -3,6 +3,8 @@ package webui
 import (
 	"html/template"
 	"net/http"
+
+	"github.com/rs/zerolog/log"
 )
 
 type homeHandler struct {
@@ -10,14 +12,18 @@ type homeHandler struct {
 }
 
 type homeData struct {
-	s SiteData
+	Name      string
+	PageTitle string
 }
 
 func (h *homeHandler) Display(w http.ResponseWriter, r *http.Request) {
+	d := homeData{
+		Name:      "World",
+		PageTitle: "Home",
+	}
 	w.WriteHeader(http.StatusOK)
-	h.t.ExecuteTemplate(w, "home.gohtml", "World")
-}
-
-func newHomeHandler() *homeHandler {
-	return nil
+	err := h.t.ExecuteTemplate(w, "home.gohtml", d)
+	if err != nil {
+		log.Error().Err(err).Msg("")
+	}
 }

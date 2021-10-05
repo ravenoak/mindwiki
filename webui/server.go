@@ -102,10 +102,8 @@ func (s *WebUIServer) setupHome() {
 		log.Fatal().Err(errors.New(errRtrNil))
 	}
 
-	s.hh = &homeHandler{}
+	s.hh = &homeHandler{t: s.tmpl}
 
-	s.hh.t = s.tmpl
-	log.Debug().Interface("s.hh.t", s.hh.t).Msg("initialized template")
 	s.rtr.HandleFunc("/", s.hh.Display).Methods("GET")
 }
 
@@ -116,6 +114,7 @@ func (s *WebUIServer) setupPages() {
 
 	s.ph = &pageHandler{
 		rtr: s.rtr.PathPrefix("/page").Subrouter(),
+		t: s.tmpl,
 	}
 	s.ph.Setup()
 }

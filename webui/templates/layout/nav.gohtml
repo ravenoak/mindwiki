@@ -1,0 +1,47 @@
+{{define "sitenav"}}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow" id="topnav">
+        <div class="container-fluid">
+            <a class="navbar-brand" href=" url mindwiki:index ">
+                <img src="/static/icons/logo.svg" width="50" height="30" class="d-inline-block rounded align-top"
+                     alt="logo" loading="lazy">
+                MindWiki
+            </a>
+            <div class="nav justify-content-end">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{% #url 'mindwiki:index' %}">Home</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarBrowseDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            Browse
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarBrowseDropdown">
+                            <li><a class="dropdown-item" href="{% #url 'mindwiki:page-index' %}">Pages</a></li>
+                            <li><a class="dropdown-item" href="{% #url 'mindwiki:project-index' %}">Projects</a></li>
+                            <li><a class="dropdown-item" href="{% #url 'mindwiki:tag-index' %}">Tags</a></li>
+                            <li><a class="dropdown-item" href="{% #url 'mindwiki:weblink-index' %}">WebLinks</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarSearchDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            Search
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarSearchDropdown">
+                            <li><a class="dropdown-item" href="{% #url 'mindwiki:page-search' %}">Pages</a></li>
+                            <li>
+                                <a class="dropdown-item" href="{% #url 'mindwiki:project-search' %}">Projects</a>
+                            </li>
+                            <li><a class="dropdown-item" href="{% #url 'mindwiki:tag-search' %}">Tags</a></li>
+                            <li><a class="dropdown-item" href="{% #url 'mindwiki:weblink-search' %}">WebLinks</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% #url 'admin:index' %}" tabindex="-1">Admin</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+{{end}}
