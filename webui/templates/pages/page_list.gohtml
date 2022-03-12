@@ -1,0 +1,53 @@
+{{- /*gotype:github.com/ravenoak/mindwiki/webui.pageListData*/ -}}
+{{define "meta"}}{{end}}
+{{define "content"}}
+     <header class="jumbotron">
+        <div class="container">
+            <nav id="page-nav" class="navbar navbar-expand-lg shadow">
+                <div class="container-fluid">
+                    <p class="h1">Welcome to the <strong>MindWiki</strong>: Pages</p>
+                </div>
+                <div class="nav justify-content-end">
+                    <div class="d-inline">
+                        <a class="nav-link text-black font-weight-bold" href="">add</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 mt-3 left">
+                {{range .P}}
+                        <div class="shadow-none card mb-4" id="newsfeed">
+                            <div class="card-body">
+                                <h3 class="card-title"><a href="{{.Slug}}">{{.Title}}</a></h3>
+                            </div>
+                        </div>
+                {{else}}
+                    <div class="container-fluid">
+                        <p>
+                            No Pages are available. Why don't you <a href="">add one</a>.
+                        </p>
+                    </div>
+                {{end}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="pagination">
+                <span class="step-links">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1">&laquo; first</a>
+                        <a href="?page={ page_obj.previous_page_number }}">previous</a>
+                    {% endif %}
+                    <span class="current">Page { page_obj.number }} of { page_obj.paginator.num_pages }}.</span>
+                    {% if page_obj.has_next %}
+                        <a href="?page={ page_obj.next_page_number }}">next</a>
+                        <a href="?page={ page_obj.paginator.num_pages }}">last &raquo;</a>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+{{end}}
+{{template "base" .}}

@@ -1,3 +1,4 @@
+{{- /*gotype:github.com/ravenoak/mindwiki/webui.SiteData*/ -}}
 {{define "footer"}}
     <footer class="footer" id="foot">
         <div class="container"><h5 style="text-align:center;"></h5>
@@ -6,10 +7,10 @@
                     <p></p>
                     <div class="nav justify-content-center" id="navfooter">
                         <span><a class="nav-link text-black font-weight-bold"
-                                 href="{% #url 'mindwiki:index' %}">About</a></span>
+                                 href="{{ .Links.Index }}">About</a></span>
                         <span><a class="nav-link text-black font-weight-bold"
                                  href="https://github.com/ravenoak/mindwiki">GitHub</a></span>
-                        <span><a class="nav-link text-black font-weight-bold" href="{% #url 'mindwiki:index' %}"></a></span>
+                        <span><a class="nav-link text-black font-weight-bold" href="{{ .Links.Index }}"></a></span>
                         <span><a class="nav-link text-black font-weight-bold" href="#"></a></span>
                     </div>
                 </div>

@@ -1,26 +1,24 @@
 package webui
 
 import (
-	"html/template"
 	"net/http"
 
 	"github.com/rs/zerolog/log"
 )
 
-type homeHandler struct {
-	t *template.Template
-}
+type homeHandler handler
 
 type homeData struct {
-	Name      string
-	PageTitle string
+	SitePage
+	Name string
 }
 
 func (h *homeHandler) Display(w http.ResponseWriter, r *http.Request) {
 	d := homeData{
-		Name:      "World",
-		PageTitle: "Home",
+		Name: "World",
 	}
+	d.PageTitle = "Home"
+	d.SiteData = h.d
 	w.WriteHeader(http.StatusOK)
 	err := h.t.ExecuteTemplate(w, "home.gohtml", d)
 	if err != nil {

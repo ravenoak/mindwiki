@@ -1,3 +1,4 @@
+{{- /*gotype:github.com/ravenoak/mindwiki/webui.pageDisplayData*/ -}}
 {{define "meta"}}{{end}}
 {{define "content"}}
     <header class="jumbotron">
@@ -24,9 +25,12 @@
                 <div class="container-fluid">
                     Tags:
                     <ul>
-                        {% for tag in page.tags.all %}
-                            <li>{ tag.name }}</li>
-                        {% endfor %}
+                        {{ range .P.Tags }}
+                            {{- /*gotype:github.com/ravenoak/mindwiki/storage.Tag*/ -}}
+                            <li>{{ .Name }}</li>
+                        {{else}}
+                            <li>No tags</li>
+                        {{end}}
                     </ul>
                 </div>
             </div>

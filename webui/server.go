@@ -2,7 +2,6 @@ package webui
 
 import (
 	"context"
-	"embed"
 	"errors"
 	"html/template"
 	"net/http"
@@ -23,21 +22,15 @@ const (
 	errRtrNil = "dude, where's your router?; `s.rtr` is nil"
 )
 
-//go:embed static/*
-var staticFS embed.FS
-
-//go:embed templates/*
-var templateFS embed.FS
-
 type WebUIServer struct {
 	addr string
 
-	rtr  *mux.Router
-	svr  *http.Server
-	tmpl *template.Template
+	rtr *mux.Router
+	svr *http.Server
 
 	static http.Handler
 
+	d  *SiteData
 	hh *homeHandler
 	ph *pageHandler
 }
@@ -68,11 +61,48 @@ func (s *WebUIServer) Stop() error {
 	return err
 }
 
+func (s *WebUIServer) setupHome() {
+	if s.rtr == nil {
+		log.Fatal().Err(errors.New(errRtrNil))
+	}
+
+	s.hh = &homeHandler{
+		t: template.Must(template.ParseFS(templateFS, "templates/home.gohtml", "templates/layout/*.gohtml")),
+		d: s.d,
+	}
+
+	s.rtr.HandleFunc("/", s.hh.Display).Methods("GET")
+}
+
+func (s *WebUIServer) setupPages() {
+	if s.rtr == nil {
+		log.Fatal().Err(errors.New(errRtrNil))
+	}
+
+	s.ph = &pageHandler{
+		rtr: s.rtr.PathPrefix("/page").Subrouter(),
+		t: make(map[string]*template.Template),
+	}
+
+	s.ph.t["detail"] = template.Must(template.ParseFS(
+		templateFS,
+		"templates/pages/page_detail.gohtml",
+		"templates/layout/*.gohtml",
+	))
+	s.ph.t["list"] = template.Must(template.ParseFS(
+		templateFS,
+		"templates/pages/page_list.gohtml",
+		"templates/layout/*.gohtml",
+	))
+	s.ph.d = s.d
+	s.ph.Setup()
+}
+
 func NewServer(addr string) *WebUIServer {
 	r := mux.NewRouter()
 	st := hashfs.FileServer(staticFS)
 
-	// r.Use(loggingMiddleware)
+	r.Use(loggingMiddleware)
 	// r.Use(handlers.RecoveryHandler())
 
 	s := &WebUIServer{
@@ -85,36 +115,18 @@ func NewServer(addr string) *WebUIServer {
 			ReadTimeout:  readTimeout,
 			WriteTimeout: writeTimeout,
 		},
+		d: &SiteData{
+			Links: &SiteLinks{
+				Index:     "/",
+				PageIndex: "/page/",
+			},
+		},
 		static: st,
 	}
 
 	r.Handle("/static", st)
-	s.tmpl = template.Must(template.ParseFS(templateFS, "templates/*.gohtml", "templates/*/*.gohtml"))
-	log.Info().Msg(s.tmpl.DefinedTemplates())
 	s.setupHome()
 	s.setupPages()
 
 	return s
-}
-
-func (s *WebUIServer) setupHome() {
-	if s.rtr == nil {
-		log.Fatal().Err(errors.New(errRtrNil))
-	}
-
-	s.hh = &homeHandler{t: s.tmpl}
-
-	s.rtr.HandleFunc("/", s.hh.Display).Methods("GET")
-}
-
-func (s *WebUIServer) setupPages() {
-	if s.rtr == nil {
-		log.Fatal().Err(errors.New(errRtrNil))
-	}
-
-	s.ph = &pageHandler{
-		rtr: s.rtr.PathPrefix("/page").Subrouter(),
-		t: s.tmpl,
-	}
-	s.ph.Setup()
 }
