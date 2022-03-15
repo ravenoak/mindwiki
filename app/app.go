@@ -4,8 +4,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/ravenoak/mindwiki/webui"
 	"github.com/rs/zerolog/log"
+
+	"github.com/ravenoak/mindwiki/storage"
+	"github.com/ravenoak/mindwiki/webui"
 )
 
 const (
@@ -17,6 +19,7 @@ type (
 	App struct {
 		Config      *Config
 		webUIServer *webui.WebUIServer
+		storage     *storage.Storage
 	}
 )
 
